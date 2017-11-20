@@ -526,6 +526,8 @@ TEST_CASE("fn_mean_robust_sparse_test")
     {
     (*i) *= std::numeric_limits<double>::max();
     }
+  x.sync_csc();
+  x.sync_cache();
   mat d(x);
 
   SpRow<double> rr = mean(x);
