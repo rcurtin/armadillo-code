@@ -577,6 +577,8 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   inline void init_batch_std(const Mat<uword>& locations, const Mat<eT>& values, const bool sort_locations);
   inline void init_batch_add(const Mat<uword>& locations, const Mat<eT>& values, const bool sort_locations);
   
+  inline SpMat(const arma_vec_indicator&, const uword in_vec_state);
+  inline SpMat(const arma_vec_indicator&, const uword in_n_rows, const uword in_n_cols, const uword in_vec_state);
   
   
   private:
@@ -591,14 +593,9 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   arma_inline arma_hot arma_warn_unused uword get_position(const uword i) const;
   arma_inline arma_hot                  void  get_position(const uword i, uword& row_of_i, uword& col_of_i) const;
   
-  /**
-   * Add an element at the given position, and return a reference to it.
-   * The element will be set to 0 (unless otherwise specified).
-   * If the element already exists, its value will be overwritten.
-   */
-  inline arma_hot arma_warn_unused eT& add_element(const uword in_row, const uword in_col, const eT in_val = eT(0));
   
-  inline arma_hot void delete_element(const uword in_row, const uword in_col);
+  inline arma_warn_unused eT&  insert_element(const uword in_row, const uword in_col, const eT in_val = eT(0));
+  inline                  void delete_element(const uword in_row, const uword in_col);
   
   
   // cache related
@@ -616,7 +613,7 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   arma_inline void sync_csc()   const;
   
   
-  friend class SpValProxy< SpMat<eT> >;  // so that SpValProxy can call add_element() and delete_element()
+  friend class SpValProxy< SpMat<eT> >;  // allow SpValProxy to call insert_element() and delete_element()
   friend class SpSubview<eT>;
   friend class SpRow<eT>;
   friend class SpCol<eT>;

@@ -14,35 +14,23 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_diagvec
+//! \addtogroup glue_intersect
 //! @{
 
 
-//! extract a diagonal from a matrix
-template<typename T1>
-arma_warn_unused
-arma_inline
-const Op<T1, op_diagvec>
-diagvec(const Base<typename T1::elem_type,T1>& X, const sword diag_id = 0)
+
+class glue_intersect
   {
-  arma_extra_debug_sigprint();
+  public:
   
-  return Op<T1, op_diagvec>(X.get_ref(), ((diag_id < 0) ? -diag_id : diag_id), ((diag_id < 0) ? 1 : 0) );
-  }
-
-
-
-template<typename T1>
-arma_warn_unused
-arma_inline
-const SpOp<T1, spop_diagvec>
-diagvec(const SpBase<typename T1::elem_type,T1>& X, const sword diag_id = 0)
-  {
-  arma_extra_debug_sigprint();
+  template<typename T1, typename T2>
+  inline static void apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_intersect>& X);
   
-  return SpOp<T1, spop_diagvec>(X.get_ref(), ((diag_id < 0) ? -diag_id : diag_id), ((diag_id < 0) ? 1 : 0) );
-  }
+  template<typename T1, typename T2>
+  inline static void apply(Mat<typename T1::elem_type>& out, uvec& iA, uvec& iB, const Base<typename T1::elem_type,T1>& A_expr, const Base<typename T1::elem_type,T2>& B_expr, const bool calc_indx);
+  };
 
 
 
 //! @}
+

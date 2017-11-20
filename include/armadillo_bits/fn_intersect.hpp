@@ -14,33 +14,48 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_diagvec
+//! \addtogroup fn_intersect
 //! @{
 
 
-//! extract a diagonal from a matrix
-template<typename T1>
+
+template<typename T1, typename T2>
 arma_warn_unused
-arma_inline
-const Op<T1, op_diagvec>
-diagvec(const Base<typename T1::elem_type,T1>& X, const sword diag_id = 0)
+inline
+typename
+enable_if2
+  <
+  ( is_arma_type<T1>::value && is_arma_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value ),
+  const Glue<T1, T2, glue_intersect>
+  >::result
+intersect
+  (
+  const T1& A,
+  const T2& B
+  )
   {
   arma_extra_debug_sigprint();
   
-  return Op<T1, op_diagvec>(X.get_ref(), ((diag_id < 0) ? -diag_id : diag_id), ((diag_id < 0) ? 1 : 0) );
+  return Glue<T1, T2, glue_intersect>(A, B);
   }
 
 
 
-template<typename T1>
-arma_warn_unused
-arma_inline
-const SpOp<T1, spop_diagvec>
-diagvec(const SpBase<typename T1::elem_type,T1>& X, const sword diag_id = 0)
+template<typename T1, typename T2>
+inline
+void
+intersect
+  (
+  Mat<typename T1::elem_type>&            C,
+  uvec&                                  iA,
+  uvec&                                  iB, 
+  const Base<typename T1::elem_type,T1>&  A,
+  const Base<typename T1::elem_type,T2>&  B
+  )
   {
   arma_extra_debug_sigprint();
   
-  return SpOp<T1, spop_diagvec>(X.get_ref(), ((diag_id < 0) ? -diag_id : diag_id), ((diag_id < 0) ? 1 : 0) );
+  glue_intersect::apply(C, iA, iB, A.get_ref(), B.get_ref(), true);  
   }
 
 

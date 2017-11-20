@@ -1,8 +1,10 @@
 Armadillo C++ Linear Algebra Library
 http://arma.sourceforge.net
 
-Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+Copyright 2008-2017 Conrad Sanderson (http://conradsanderson.id.au)
 Copyright 2008-2016 National ICT Australia (NICTA)
+Copyright 2017      Arroyo Consortium
+Copyright 2017      Data61, CSIRO
 
 
 
@@ -180,11 +182,15 @@ For example, for GCC and Clang compilers use -O2 or -O3
   If you don't have root/administrator/superuser privileges, 
   type the following command:
   
-  make install DESTDIR=my_usr_dir
+  make install DESTDIR=my_directory
   
-  where "my_usr_dir" is for storing C++ headers and library files.
+  where "my_directory" is an alternative directory for storing
+  C++ headers and library files.
   Caveat: make sure your C++ compiler is configured to use the
   "lib" and "include" sub-directories present within this directory.
+  Note that the "lib" directory might be named differently on your system.
+  On recent 64 bit Debian & Ubuntu systems it is "lib/x86_64-linux-gnu".
+  On recent 64 bit Fedora & RHEL systems it is "lib64".
 
 
 
@@ -430,21 +436,21 @@ implementation details, and may change or be removed without notice.
 15: Bug Reports and Frequently Asked Questions
 ==============================================
 
-Armadillo has gone through extensive testing and
-has been successfully used in production environments.
-However, as with almost all software, it's impossible
-to guarantee 100% correct functionality.
+Armadillo has gone through extensive testing and has been successfully
+used in production environments. However, as with almost all software,
+it's impossible to guarantee 100% correct functionality.
 
-If you find a bug in the library or the documentation,
-we are interested in hearing about it. Please make a
-_small_ and _self-contained_ program which exposes the bug,
-and then send the program source and the bug description
-to the developers. The contact details are at:
+If you find a bug in the library or the documentation, we are interested
+in hearing about it. Please make a _small_ and _self-contained_ program
+which exposes the bug, and then send the program source and the bug description
+to the developers. The small program must have a main() function and use only
+functions/classes from Armadillo and the standard C++ library (no other libraries).
+
+The contact details are at:
 
   http://arma.sourceforge.net/contact.html
 
-Further information about Armadillo as well as
-answers to frequently asked questions are at:
+Further information about Armadillo is on the frequently asked questions page:
 
   http://arma.sourceforge.net/faq.html
 
@@ -468,4 +474,4 @@ Octave/Matlab with C++ code that uses Armadillo matrices.
   https://sourceforge.net/projects/sigpack/
   
 * matlab2cpp: conversion of Matlab code to Armadillo based C++ code
-  https://github.com/emc2norway/m2cpp
+  https://github.com/jonathf/matlab2cpp
