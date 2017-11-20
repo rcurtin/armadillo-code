@@ -41,6 +41,7 @@ class MapMat
   typedef typename std::map<uword, eT> map_type;
   
   arma_aligned map_type* map_ptr;
+  arma_aligned SpMat<eT>* parent; // could be NULL
   
   
   public:
@@ -115,6 +116,95 @@ class MapMat
   
   // for experimental purposes only
   inline void mul(const MapMat<eT>& A, const MapMat<eT>& B);
+
+  class const_iterator;
+  class iterator;
+
+  // an iterator class; TODO: HERE
+  class const_iterator
+    {
+    public:
+
+    inline const_iterator();
+    inline const_iterator(const MapMat<eT>& in, const bool end = false);
+    inline const_iterator(const MapMat<eT>& in, const uword col, const uword row);
+    inline const_iterator(const iterator& it);
+
+    arma_inline const_iterator& operator++();
+    arma_inline const_iterator& operator--();
+    arma_inline const_iterator operator++(int);
+    arma_inline const_iterator operator--(int);
+
+    arma_inline eT operator*() const;
+
+    arma_inline bool operator==(const const_iterator& other) const;
+    arma_inline bool operator!=(const const_iterator& other) const;
+
+    arma_inline bool operator==(const typename SpSubview<eT>::const_iterator& other) const;
+    arma_inline bool operator!=(const typename SpSubview<eT>::const_iterator& other) const;
+    arma_inline bool operator==(const typename SpSubview<eT>::iterator& other) const;
+    arma_inline bool operator!=(const typename SpSubview<eT>::iterator& other) const;
+    arma_inline bool operator==(const iterator& other) const;
+    arma_inline bool operator!=(const iterator& other) const;
+
+    // calculate positions
+    arma_inline uword row() const;
+    arma_inline uword col() const;
+    arma_inline uword pos() const;
+
+    arma_aligned const MapMat* m;
+    arma_aligned typename map_type::const_iterator internal_it;
+    arma_aligned uword internal_pos;
+
+    // so that we satisfy the STL iterator types
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef eT                              value_type;
+    typedef uword                           difference_type; // not certain on this one
+    typedef const eT*                       pointer;
+    typedef const eT&                       reference;
+    };
+
+  class iterator
+    {
+    public:
+
+    inline iterator();
+    inline iterator(MapMat<eT>& in, const bool end = false);
+    inline iterator(MapMat<eT>& in, const uword col, const uword row);
+
+    inline arma_hot MapMat_val<eT> operator*();
+
+    arma_inline iterator& operator++();
+    arma_inline iterator& operator--();
+    arma_inline iterator operator++(int);
+    arma_inline iterator operator--(int);
+
+    arma_inline bool operator==(const const_iterator& other) const;
+    arma_inline bool operator!=(const const_iterator& other) const;
+    arma_inline bool operator==(const iterator& other) const;
+    arma_inline bool operator!=(const iterator& other) const;
+
+    arma_inline bool operator==(const typename SpSubview<eT>::const_iterator& other) const;
+    arma_inline bool operator!=(const typename SpSubview<eT>::const_iterator& other) const;
+    arma_inline bool operator==(const typename SpSubview<eT>::iterator& other) const;
+    arma_inline bool operator!=(const typename SpSubview<eT>::iterator& other) const;
+
+    // calculate positions
+    arma_inline uword row() const;
+    arma_inline uword col() const;
+    arma_inline uword pos() const;
+
+    arma_aligned MapMat* m;
+    arma_aligned typename map_type::iterator internal_it;
+    arma_aligned uword internal_pos;
+
+    // so that we satisfy the STL iterator types
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef eT                              value_type;
+    typedef uword                           difference_type; // not certain on this one
+    typedef const eT*                       pointer;
+    typedef const eT&                       reference;
+    };
   
   private:
   

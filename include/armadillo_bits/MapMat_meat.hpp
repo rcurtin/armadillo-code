@@ -44,6 +44,7 @@ MapMat<eT>::MapMat()
   , n_cols (0)
   , n_elem (0)
   , map_ptr(NULL)
+  , parent(NULL)
   {
   arma_extra_debug_sigprint_this(this);
   
@@ -59,6 +60,7 @@ MapMat<eT>::MapMat(const uword in_n_rows, const uword in_n_cols)
   , n_cols (in_n_cols)
   , n_elem (in_n_rows * in_n_cols)
   , map_ptr(NULL)
+  , parent(NULL)
   {
   arma_extra_debug_sigprint_this(this);
   
@@ -74,6 +76,7 @@ MapMat<eT>::MapMat(const SizeMat& s)
   , n_cols (s.n_cols)
   , n_elem (s.n_rows * s.n_cols)
   , map_ptr(NULL)
+  , parent(NULL)
   {
   arma_extra_debug_sigprint_this(this);
   
@@ -89,6 +92,7 @@ MapMat<eT>::MapMat(const MapMat<eT>& x)
   , n_cols (0)
   , n_elem (0)
   , map_ptr(NULL)
+  , parent(NULL)
   {
   arma_extra_debug_sigprint_this(this);
   
@@ -124,6 +128,7 @@ MapMat<eT>::MapMat(const SpMat<eT>& x)
   , n_cols (0)
   , n_elem (0)
   , map_ptr(NULL)
+  , parent(&x)
   {
   arma_extra_debug_sigprint_this(this);
   
@@ -1082,6 +1087,9 @@ MapMat<eT>::erase_val(const uword index)
   typename map_type::iterator it_end = map_ref.end();
   
   if(it != it_end)  { map_ref.erase(it); }
+
+  if (parent != NULL)
+    access::rw(parent->n_nonzero)--;
   }
 
 

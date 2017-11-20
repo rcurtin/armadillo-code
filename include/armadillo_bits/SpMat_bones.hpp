@@ -351,8 +351,8 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   
   // necessary forward declarations
   class iterator_base;
-  class iterator;
-  class const_iterator;
+//  class iterator;
+//  class const_iterator;
   class row_iterator;
   class const_row_iterator;
   
@@ -384,66 +384,11 @@ class SpMat : public SpBase< eT, SpMat<eT> >
     typedef const eT&                       reference;
     };
   
-  class const_iterator : public iterator_base
-    {
-    public:
-    
-    inline const_iterator();
-    inline const_iterator(const SpMat& in_M, uword initial_pos = 0); // assumes initial_pos is valid
-    //! once initialised, will be at the first nonzero value after the given position (using forward columnwise traversal)
-    inline const_iterator(const SpMat& in_M, uword in_row, uword in_col);
-    //! if you know the exact position of the iterator;  in_row is a dummy argument
-    inline const_iterator(const SpMat& in_M, uword in_row, uword in_col, uword in_pos);
-    inline const_iterator(const const_iterator& other);
-    
-    inline arma_hot const_iterator& operator++();
-    inline arma_hot const_iterator  operator++(int);
-    
-    inline arma_hot const_iterator& operator--();
-    inline arma_hot const_iterator  operator--(int);
-    
-    inline arma_hot bool operator==(const const_iterator& rhs) const;
-    inline arma_hot bool operator!=(const const_iterator& rhs) const;
-    
-    inline arma_hot bool operator==(const typename SpSubview<eT>::const_iterator& rhs) const;
-    inline arma_hot bool operator!=(const typename SpSubview<eT>::const_iterator& rhs) const;
-    
-    inline arma_hot bool operator==(const const_row_iterator& rhs) const;
-    inline arma_hot bool operator!=(const const_row_iterator& rhs) const;
-    
-    inline arma_hot bool operator==(const typename SpSubview<eT>::const_row_iterator& rhs) const;
-    inline arma_hot bool operator!=(const typename SpSubview<eT>::const_row_iterator& rhs) const;
-    };
+  typedef typename MapMat<eT>::const_iterator const_iterator;
+  friend typename MapMat<eT>::const_iterator;
   
-  /**
-   * So that we can iterate over nonzero values, we need an iterator implementation.
-   * This can't be as simple as for Mat, which is just a pointer to an eT.
-   * If a value is set to 0 using this iterator, the iterator is no longer valid!
-   */
-  class iterator : public const_iterator
-    {
-    public:
-    
-    inline iterator() : const_iterator() { }
-    inline iterator(SpMat& in_M, uword initial_pos = 0) : const_iterator(in_M, initial_pos) { }
-    inline iterator(SpMat& in_M, uword in_row, uword in_col) : const_iterator(in_M, in_row, in_col) { }
-    inline iterator(SpMat& in_M, uword in_row, uword in_col, uword in_pos) : const_iterator(in_M, in_row, in_col, in_pos) { }
-    inline iterator(const iterator& other) : const_iterator(other) { }
-    
-    inline arma_hot SpValProxy<SpMat<eT> > operator*();
-    
-    // overloads needed for return type correctness
-    inline arma_hot iterator& operator++();
-    inline arma_hot iterator  operator++(int);
-    
-    inline arma_hot iterator& operator--();
-    inline arma_hot iterator  operator--(int);
-    
-    // this has a different value_type than iterator_base
-    typedef SpValProxy<SpMat<eT> >         value_type;
-    typedef const SpValProxy<SpMat<eT> >*  pointer;
-    typedef const SpValProxy<SpMat<eT> >&  reference;
-    };
+  typedef typename MapMat<eT>::iterator iterator;
+  friend typename MapMat<eT>::iterator;
   
   class const_row_iterator : public iterator_base
     {
@@ -608,11 +553,12 @@ class SpMat : public SpBase< eT, SpMat<eT> >
   
   arma_inline void invalidate_cache() const;
   arma_inline void invalidate_csc()   const;
-  
+
+ public:
   arma_inline void sync_cache() const;
   arma_inline void sync_csc()   const;
   
-  
+ private:
   friend class SpValProxy< SpMat<eT> >;  // allow SpValProxy to call insert_element() and delete_element()
   friend class SpSubview<eT>;
   friend class SpRow<eT>;

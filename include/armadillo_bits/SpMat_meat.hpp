@@ -3481,7 +3481,6 @@ SpMat<eT>::reshape(const uword in_rows, const uword in_cols)
   if( (n_rows == in_rows) && (n_cols == in_cols) )  { return; }
   
   sync_csc();
-  invalidate_cache();
   
   // We have to modify all of the relevant row indices and the relevant column pointers.
   // Iterate over all the points to do this.  We won't be deleting any points, but we will be modifying
@@ -3517,6 +3516,9 @@ SpMat<eT>::reshape(const uword in_rows, const uword in_cols)
   // Now set the size.
   access::rw(n_rows) = in_rows;
   access::rw(n_cols) = in_cols;
+
+  invalidate_cache();
+  sync_cache();
   }
 
 
@@ -3566,6 +3568,9 @@ SpMat<eT>::reshape(const uword in_rows, const uword in_cols, const uword dim)
     
     steal_mem(tmp);
     }
+
+  invalidate_cache();
+  sync_cache();
   }
 
 
@@ -4861,8 +4866,8 @@ SpMat<eT>::remove_zeros()
     
     uword new_index = 0;
     
-    const_iterator it     = begin();
-    const_iterator it_end = end();
+    iterator it     = begin();
+    iterator it_end = end();
     
     for(; it != it_end; ++it)
       {
@@ -5087,9 +5092,12 @@ SpMat<eT>::begin()
   {
   arma_extra_debug_sigprint();
   
-  sync_csc();
+  sync_cache();
+  // Pre-emptively mark CSC representation invalid in case the iterator has some
+  // elements modified.
+  invalidate_csc();
   
-  return iterator(*this);
+  return iterator(cache);
   }
 
 
@@ -5101,9 +5109,9 @@ SpMat<eT>::begin() const
   {
   arma_extra_debug_sigprint();
   
-  sync_csc();
+  sync_cache();
   
-  return const_iterator(*this);
+  return const_iterator(cache);
   }
 
 
@@ -5113,9 +5121,10 @@ inline
 typename SpMat<eT>::iterator
 SpMat<eT>::end()
   {
-  sync_csc();
+  sync_cache();
+  invalidate_csc();
   
-  return iterator(*this, 0, n_cols, n_nonzero);
+  return iterator(cache, true);
   }
 
 
@@ -5125,9 +5134,9 @@ inline
 typename SpMat<eT>::const_iterator
 SpMat<eT>::end() const
   {
-  sync_csc();
+  sync_cache();
   
-  return const_iterator(*this, 0, n_cols, n_nonzero);
+  return const_iterator(cache, true);
   }
 
 
@@ -5137,9 +5146,10 @@ inline
 typename SpMat<eT>::iterator
 SpMat<eT>::begin_col(const uword col_num)
   {
-  sync_csc();
+  sync_cache();
+  invalidate_csc();
   
-  return iterator(*this, 0, col_num);
+  return iterator(cache, 0, col_num);
   }
 
 
@@ -5149,9 +5159,9 @@ inline
 typename SpMat<eT>::const_iterator
 SpMat<eT>::begin_col(const uword col_num) const
   {
-  sync_csc();
+  sync_cache();
   
-  return const_iterator(*this, 0, col_num);
+  return const_iterator(cache, 0, col_num);
   }
 
 
@@ -5161,9 +5171,10 @@ inline
 typename SpMat<eT>::iterator
 SpMat<eT>::end_col(const uword col_num)
   {
-  sync_csc();
+  sync_cache();
+  invalidate_csc();
   
-  return iterator(*this, 0, col_num + 1);
+  return iterator(cache, 0, col_num + 1);
   }
 
 
@@ -5173,9 +5184,9 @@ inline
 typename SpMat<eT>::const_iterator
 SpMat<eT>::end_col(const uword col_num) const
   {
-  sync_csc();
+  sync_cache();
   
-  return const_iterator(*this, 0, col_num + 1);
+  return const_iterator(cache, 0, col_num + 1);
   }
 
 
@@ -5257,7 +5268,8 @@ inline
 typename SpMat<eT>::row_col_iterator
 SpMat<eT>::begin_row_col()
   {
-  sync_csc();
+  sync_cache();
+  invalidate_csc();
   
   return begin();
   }
@@ -5269,7 +5281,7 @@ inline
 typename SpMat<eT>::const_row_col_iterator
 SpMat<eT>::begin_row_col() const
   {
-  sync_csc();
+  sync_cache();
   
   return begin();
   }
@@ -5280,7 +5292,8 @@ template<typename eT>
 inline typename SpMat<eT>::row_col_iterator
 SpMat<eT>::end_row_col()
   {
-  sync_csc();
+  sync_cache();
+  invalidate_csc();
   
   return end();
   }
@@ -5292,7 +5305,7 @@ inline
 typename SpMat<eT>::const_row_col_iterator
 SpMat<eT>::end_row_col() const
   {
-  sync_csc();
+  sync_cache();
   
   return end();
   }
@@ -5717,14 +5730,16 @@ SpMat<eT>::sync_cache() const
   #pragma omp critical
     if(sync_state == 0)
       {
-      cache      = (*this);
-      sync_state = 2;
+      cache        = (*this);
+      cache.parent = &access::rw(*this);
+      sync_state   = 2;
       }
   #else
     if(sync_state == 0)
       {
-      cache      = (*this);
-      sync_state = 2;
+      cache        = (*this);
+      cache.parent = &access::rw(*this);
+      sync_state   = 2;
       }
   #endif
   }

@@ -592,6 +592,7 @@ namespace arma
   #include "armadillo_bits/SpSubview_iterators_meat.hpp"
   #include "armadillo_bits/spdiagview_meat.hpp"
   #include "armadillo_bits/MapMat_meat.hpp"
+  #include "armadillo_bits/MapMat_iterators_meat.hpp"
   
   #include "armadillo_bits/diskio_meat.hpp"
   #include "armadillo_bits/wall_clock_meat.hpp"
